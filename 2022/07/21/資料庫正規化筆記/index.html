@@ -1,0 +1,498 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#222" media="(prefers-color-scheme: dark)"><meta name="generator" content="Hexo 6.2.0">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css" integrity="sha256-DfWjNxDkM94fVBWx1H5BMMp0Zq7luBlV8QRcSES7s+0=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"example.com","root":"/","images":"/images","scheme":"Gemini","darkmode":true,"version":"8.12.1","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12},"copycode":{"enable":true,"style":null},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":true,"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜尋...","empty":"我們無法找到任何有關 ${query} 的搜索結果","hits_time":"${hits} 找到 ${time} 個結果","hits":"找到 ${hits} 個結果"}}</script><script src="/js/config.js"></script>
+<!-- Global site tag (gtag.js) - Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-X2K77WZ9WF"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-X2K77WZ9WF');
+</script>
+    <meta name="description" content="正規化概念資料庫正規化，又稱正規化、標準化，是資料庫設計的一系列原理和技術，以減少資料庫中數據冗餘，增進數據的一致性。現在資料庫設計最多滿足3NF，普遍認為正規化過高，雖然具有對數據關係更好的約束性，但也導致數據關係表增加而令資料庫IO更易繁忙。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="資料庫正規化筆記">
+<meta property="og:url" content="http://example.com/2022/07/21/%E8%B3%87%E6%96%99%E5%BA%AB%E6%AD%A3%E8%A6%8F%E5%8C%96%E7%AD%86%E8%A8%98/index.html">
+<meta property="og:site_name" content="Andy&#39;s Blog">
+<meta property="og:description" content="正規化概念資料庫正規化，又稱正規化、標準化，是資料庫設計的一系列原理和技術，以減少資料庫中數據冗餘，增進數據的一致性。現在資料庫設計最多滿足3NF，普遍認為正規化過高，雖然具有對數據關係更好的約束性，但也導致數據關係表增加而令資料庫IO更易繁忙。">
+<meta property="og:locale" content="zh_TW">
+<meta property="og:image" content="https://hackmd.io/_uploads/H1IPXY5sc.png">
+<meta property="og:image" content="https://hackmd.io/_uploads/Hyeucqqi9.png">
+<meta property="og:image" content="https://hackmd.io/_uploads/HkD89c9s9.png">
+<meta property="og:image" content="https://hackmd.io/_uploads/Sk9YCc9i5.png">
+<meta property="og:image" content="https://hackmd.io/_uploads/SkS18o9i9.png">
+<meta property="og:image" content="https://hackmd.io/_uploads/H1g98jqs5.png">
+<meta property="og:image" content="https://hackmd.io/_uploads/ryleplp9ic.png">
+<meta property="og:image" content="https://hackmd.io/_uploads/ryCK9o9j9.png">
+<meta property="og:image" content="https://hackmd.io/_uploads/Sy8aaj9j5.png">
+<meta property="og:image" content="https://hackmd.io/_uploads/S1X3ao5sc.png">
+<meta property="og:image" content="https://hackmd.io/_uploads/HypaX29oc.png">
+<meta property="og:image" content="https://hackmd.io/_uploads/B1MFq65o9.png">
+<meta property="article:published_time" content="2022-07-21T07:16:57.000Z">
+<meta property="article:modified_time" content="2022-07-21T07:16:57.973Z">
+<meta property="article:author" content="Andy Huang">
+<meta property="article:tag" content="SQL">
+<meta property="article:tag" content="Normalization">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://hackmd.io/_uploads/H1IPXY5sc.png">
+
+
+<link rel="canonical" href="http://example.com/2022/07/21/%E8%B3%87%E6%96%99%E5%BA%AB%E6%AD%A3%E8%A6%8F%E5%8C%96%E7%AD%86%E8%A8%98/">
+
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-TW","comments":true,"permalink":"http://example.com/2022/07/21/%E8%B3%87%E6%96%99%E5%BA%AB%E6%AD%A3%E8%A6%8F%E5%8C%96%E7%AD%86%E8%A8%98/","path":"2022/07/21/資料庫正規化筆記/","title":"資料庫正規化筆記"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>資料庫正規化筆記 | Andy's Blog</title>
+  
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-X2K77WZ9WF"></script>
+  <script class="next-config" data-name="google_analytics" type="application/json">{"tracking_id":"G-X2K77WZ9WF","only_pageview":false}</script>
+  <script src="/js/third-party/analytics/google-analytics.js"></script>
+
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切換導航欄" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">Andy's Blog</p>
+      <i class="logo-line"></i>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首頁</a></li><li class="menu-item menu-item-categories"><a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分類</a></li><li class="menu-item menu-item-tags"><a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>標籤</a></li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+        
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目錄
+        </li>
+        <li class="sidebar-nav-overview">
+          本站概要
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%AD%A3%E8%A6%8F%E5%8C%96%E6%A6%82%E5%BF%B5"><span class="nav-number">1.</span> <span class="nav-text">正規化概念</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%AE%9A%E7%BE%A9"><span class="nav-number">1.1.</span> <span class="nav-text">定義</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%B8%8D%E7%95%B6%E8%A8%AD%E8%A8%88%E9%80%A0%E6%88%90%E7%9A%84%E7%95%B0%E5%B8%B8"><span class="nav-number">1.2.</span> <span class="nav-text">不當設計造成的異常</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%B0%8F%E7%B5%90"><span class="nav-number">1.3.</span> <span class="nav-text">小結</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BE%86%E7%9C%8B%E5%80%8B%E4%BE%8B%E5%AD%90"><span class="nav-number">2.</span> <span class="nav-text">來看個例子</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%B8%8D%E7%95%B6%E8%A8%AD%E8%A8%88%E7%9A%84%E5%BD%B1%E9%9F%BF"><span class="nav-number">2.1.</span> <span class="nav-text">不當設計的影響</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%AD%A3%E8%A6%8F%E5%8C%96%E6%AD%A5%E9%A9%9F"><span class="nav-number">3.</span> <span class="nav-text">正規化步驟</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%85%88%E6%8A%8A%E8%B3%87%E6%96%99%E5%84%B2%E5%AD%98%E5%9C%A8%E8%B3%87%E6%96%99%E8%A1%A8%E5%85%A7%EF%BC%88%E6%9C%AA%E6%AD%A3%E8%A6%8F%E5%8C%96%E7%9A%84%E8%B3%87%E6%96%99%E8%A1%A8%EF%BC%89"><span class="nav-number">3.1.</span> <span class="nav-text">先把資料儲存在資料表內（未正規化的資料表）</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%9C%AA%E7%AC%A6%E5%90%88%E7%AC%AC%E4%B8%80%E6%AD%A3%E8%A6%8F%E5%8C%96%E9%80%A0%E6%88%90%E7%9A%84%E5%95%8F%E9%A1%8C"><span class="nav-number">3.1.1.</span> <span class="nav-text">未符合第一正規化造成的問題</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%AC%AC%E4%B8%80%E6%AD%A3%E8%A6%8F%E5%8C%96%EF%BC%881NF%EF%BC%89"><span class="nav-number">3.2.</span> <span class="nav-text">第一正規化（1NF）</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%AE%9A%E7%BE%A9-1"><span class="nav-number">3.2.1.</span> <span class="nav-text">定義</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E4%BD%9C%E6%B3%95"><span class="nav-number">3.2.2.</span> <span class="nav-text">作法</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%9B%9E%E5%88%B0%E9%81%B8%E8%AA%B2%E8%A1%A8"><span class="nav-number">3.2.3.</span> <span class="nav-text">回到選課表</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%AC%AC%E4%BA%8C%E6%AD%A3%E8%A6%8F%E5%8C%96%EF%BC%882NF%EF%BC%89"><span class="nav-number">3.3.</span> <span class="nav-text">第二正規化（2NF）</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%AE%9A%E7%BE%A9-2"><span class="nav-number">3.3.1.</span> <span class="nav-text">定義</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E4%BD%9C%E6%B3%95-1"><span class="nav-number">3.3.2.</span> <span class="nav-text">作法</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%9B%9E%E5%88%B0%E9%81%B8%E8%AA%B2%E8%A1%A8-1"><span class="nav-number">3.3.3.</span> <span class="nav-text">回到選課表</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#%E5%AD%98%E5%9C%A8%E3%80%8C%E9%83%A8%E5%88%86%E5%8A%9F%E8%83%BD%E7%9B%B8%E4%BE%9D%E3%80%8D%EF%BC%8C%E9%9C%80%E8%A6%81%E5%B0%87%E9%83%A8%E5%88%86%E5%8A%9F%E8%83%BD%E7%9B%B8%E4%BE%9D%E6%AC%84%E4%BD%8D%E5%88%86%E5%89%B2%EF%BC%882NF%EF%BC%89%EF%BC%8C%E4%BB%A5%E4%B8%8B%E7%82%BA%E5%88%86%E5%89%B2%E5%BE%8C%E7%B5%90%E6%9E%9C"><span class="nav-number">3.3.3.1.</span> <span class="nav-text">存在「部分功能相依」，需要將部分功能相依欄位分割（2NF），以下為分割後結果</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#%E7%99%BC%E7%8F%BE%E3%80%8C%E9%87%8D%E8%A4%87%E7%9A%84%E8%B3%87%E6%96%99%E3%80%8D%EF%BC%8C%E5%9B%A0%E7%82%BA%E9%9C%80%E7%AC%A6%E5%90%881NF%EF%BC%8C%E6%89%80%E4%BB%A5%E5%B0%87%E9%87%8D%E8%A4%87%E7%9A%84%E8%B3%87%E6%96%99%E5%8E%BB%E9%99%A4"><span class="nav-number">3.3.3.2.</span> <span class="nav-text">發現「重複的資料」，因為需符合1NF，所以將重複的資料去除</span></a></li></ol></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%AC%AC%E4%B8%89%E6%AD%A3%E8%A6%8F%E5%8C%96%EF%BC%883NF%EF%BC%89"><span class="nav-number">3.4.</span> <span class="nav-text">第三正規化（3NF）</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%AE%9A%E7%BE%A9-3"><span class="nav-number">3.4.1.</span> <span class="nav-text">定義</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E4%BD%9C%E6%B3%95-2"><span class="nav-number">3.4.2.</span> <span class="nav-text">作法</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%B0%87%E6%9C%89%E9%81%9E%E7%A7%BB%E7%9B%B8%E4%BE%9D%E7%9A%84%E6%AC%84%E4%BD%8D%E5%88%86%E5%89%B2%E5%87%BA%E5%8E%BB"><span class="nav-number">3.4.3.</span> <span class="nav-text">將有遞移相依的欄位分割出去</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%AD%A3%E8%A6%8F%E5%8C%96%E7%B5%90%E6%9E%9C"><span class="nav-number">3.5.</span> <span class="nav-text">正規化結果</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Boyee-Codd%E6%AD%A3%E8%A6%8F%E5%8C%96%EF%BC%88BCNF%EF%BC%89"><span class="nav-number">3.6.</span> <span class="nav-text">Boyee-Codd正規化（BCNF）</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%AE%9A%E7%BE%A9-4"><span class="nav-number">3.6.1.</span> <span class="nav-text">定義</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E4%BD%9C%E6%B3%95-3"><span class="nav-number">3.6.2.</span> <span class="nav-text">作法</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E7%A2%BA%E8%AA%8D%E8%B3%87%E6%96%99%E8%A1%A8%E6%98%AF%E5%90%A6%E9%83%BD%E6%9C%89%E7%AC%A6%E5%90%88BCNF"><span class="nav-number">3.6.3.</span> <span class="nav-text">確認資料表是否都有符合BCNF</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Schema"><span class="nav-number">4.</span> <span class="nav-text">Schema</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%B5%90%E8%AB%96"><span class="nav-number">5.</span> <span class="nav-text">結論</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8F%83%E8%80%83%E8%B3%87%E6%96%99"><span class="nav-number">6.</span> <span class="nav-text">參考資料</span></a></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author site-overview-item animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Andy Huang"
+      src="/images/avatar.jpeg">
+  <p class="site-author-name" itemprop="name">Andy Huang</p>
+  <div class="site-description" itemprop="description">PM / Software Engineer / Student Coach @Build School</div>
+</div>
+<div class="site-state-wrap site-overview-item animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">7</span>
+          <span class="site-state-item-name">文章</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+          <a href="/categories/">
+        <span class="site-state-item-count">3</span>
+        <span class="site-state-item-name">分類</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+          <a href="/tags/">
+        <span class="site-state-item-count">6</span>
+        <span class="site-state-item-name">標籤</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+        </div>
+      </div>
+    </div>
+  </aside>
+  <div class="sidebar-dimmer"></div>
+
+
+    </header>
+
+    
+  <div class="back-to-top" role="button" aria-label="回到頂端">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+  <div class="reading-progress-bar"></div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-TW">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2022/07/21/%E8%B3%87%E6%96%99%E5%BA%AB%E6%AD%A3%E8%A6%8F%E5%8C%96%E7%AD%86%E8%A8%98/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.jpeg">
+      <meta itemprop="name" content="Andy Huang">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Andy's Blog">
+      <meta itemprop="description" content="PM / Software Engineer / Student Coach @Build School">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="資料庫正規化筆記 | Andy's Blog">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          資料庫正規化筆記
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">發表於</span>
+
+      <time title="創建時間：2022-07-21 15:16:57" itemprop="dateCreated datePublished" datetime="2022-07-21T15:16:57+08:00">2022-07-21</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分類於</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E8%B3%87%E6%96%99%E5%BA%AB%E7%AD%86%E8%A8%98/" itemprop="url" rel="index"><span itemprop="name">資料庫筆記</span></a>
+        </span>
+    </span>
+
+  
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="far fa-comment"></i>
+      </span>
+      <span class="post-meta-item-text">Disqus：</span>
+    
+    <a title="disqus" href="/2022/07/21/%E8%B3%87%E6%96%99%E5%BA%AB%E6%AD%A3%E8%A6%8F%E5%8C%96%E7%AD%86%E8%A8%98/#disqus_thread" itemprop="discussionUrl">
+      <span class="post-comments-count disqus-comment-count" data-disqus-identifier="2022/07/21/資料庫正規化筆記/" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+        <h2 id="正規化概念"><a href="#正規化概念" class="headerlink" title="正規化概念"></a>正規化概念</h2><p>資料庫正規化，又稱正規化、標準化，是資料庫設計的一系列原理和技術，以減少資料庫中數據冗餘，增進數據的一致性。<br>現在資料庫設計最多滿足3NF，普遍認為正規化過高，雖然具有對數據關係更好的約束性，但也導致數據關係表增加而令資料庫IO更易繁忙。</p>
+<span id="more"></span>
+<h3 id="定義"><a href="#定義" class="headerlink" title="定義"></a>定義</h3><p>將原先關聯表格的所有資訊，在分解成其他表格後，仍可以透過「合併」新關聯表格的方式得到相同的資訊，亦為「無損失分解」（Lossless Decomposition）。</p>
+<h3 id="不當設計造成的異常"><a href="#不當設計造成的異常" class="headerlink" title="不當設計造成的異常"></a>不當設計造成的異常</h3><ul>
+<li>新增異常：新增時，資料不齊全。</li>
+<li>刪除異常：刪除時，造成資料遺失。</li>
+<li>更新異常：更新時，可能會漏改。</li>
+</ul>
+<h3 id="小結"><a href="#小結" class="headerlink" title="小結"></a>小結</h3><p>正規化的目的就是為了刪除「重複的資料」(Data Redundancy)及「避免更新異常」(Anomalies)，每個階段都是以「欄位的相依性」作為分割資料表的依據，在實務上通常以滿足3NF即可。</p>
+<h2 id="來看個例子"><a href="#來看個例子" class="headerlink" title="來看個例子"></a>來看個例子</h2><p><img src="https://hackmd.io/_uploads/H1IPXY5sc.png"></p>
+<h3 id="不當設計的影響"><a href="#不當設計的影響" class="headerlink" title="不當設計的影響"></a>不當設計的影響</h3><ul>
+<li>新增異常：<ul>
+<li>新增學生，但未選課</li>
+<li>新增課程，但未被選課</li>
+<li>新增老師，但未授課</li>
+</ul>
+</li>
+<li>刪除異常：<ul>
+<li>刪除課程時，學生的成績資料遺失</li>
+</ul>
+</li>
+<li>更新異常：<ul>
+<li>更新課程資料時，需一次修改多筆資料</li>
+<li>更新老師資料時，需一次修改多筆資料</li>
+</ul>
+</li>
+</ul>
+<h2 id="正規化步驟"><a href="#正規化步驟" class="headerlink" title="正規化步驟"></a>正規化步驟</h2><h3 id="先把資料儲存在資料表內（未正規化的資料表）"><a href="#先把資料儲存在資料表內（未正規化的資料表）" class="headerlink" title="先把資料儲存在資料表內（未正規化的資料表）"></a>先把資料儲存在資料表內（未正規化的資料表）</h3><p><img src="https://hackmd.io/_uploads/Hyeucqqi9.png"></p>
+<h4 id="未符合第一正規化造成的問題"><a href="#未符合第一正規化造成的問題" class="headerlink" title="未符合第一正規化造成的問題"></a>未符合第一正規化造成的問題</h4><p>單一個欄位內有超過1個以上的值。<br>欄位長度無法確定（可能很多，也可能很少），必須預留空間，造成儲存空間的浪費。<br><img src="https://hackmd.io/_uploads/HkD89c9s9.png"></p>
+<h3 id="第一正規化（1NF）"><a href="#第一正規化（1NF）" class="headerlink" title="第一正規化（1NF）"></a>第一正規化（1NF）</h3><h4 id="定義-1"><a href="#定義-1" class="headerlink" title="定義"></a>定義</h4><ol>
+<li>要排除重複群的出現，要求每一列資料的欄位值都只能是單一值（基元值）。</li>
+<li>沒有任何兩筆以上的資料完全重複。</li>
+<li>資料表中需有主鍵（唯一值），其他所有欄位都相依於主鍵。</li>
+<li>同一張資料表內，不建議用多個欄位表達同一個事情（如下圖）。<br><img src="https://hackmd.io/_uploads/Sk9YCc9i5.png"></li>
+</ol>
+<h4 id="作法"><a href="#作法" class="headerlink" title="作法"></a>作法</h4><ol>
+<li>確認是否有重複表達的欄位。</li>
+<li>將欄位內重複的資料分別存為不同的Data Row資料。</li>
+</ol>
+<h4 id="回到選課表"><a href="#回到選課表" class="headerlink" title="回到選課表"></a>回到選課表</h4><p><img src="https://hackmd.io/_uploads/SkS18o9i9.png"><br>可以將學號&amp;課程代碼組合成唯一值（Key），透過學號&amp;課程代碼，可以修改成績。</p>
+<h3 id="第二正規化（2NF）"><a href="#第二正規化（2NF）" class="headerlink" title="第二正規化（2NF）"></a>第二正規化（2NF）</h3><h4 id="定義-2"><a href="#定義-2" class="headerlink" title="定義"></a>定義</h4><ol>
+<li>符合1NF。</li>
+<li>消除「部分功能相依」，每一個非鍵欄位必須完全相依主鍵（學號&#x3D;&gt;學生，課程&#x3D;&gt;學分…），通常「主鍵有多個欄位」組成時會發生「部分功能相依」。</li>
+</ol>
+<h4 id="作法-1"><a href="#作法-1" class="headerlink" title="作法"></a>作法</h4><ol>
+<li>檢查是否存在「部分功能相依」（可從多個欄位組成的主鍵開始檢查）。</li>
+<li>將「部分功能相依」的欄位分割出去，另外組成新的資料表。</li>
+</ol>
+<h4 id="回到選課表-1"><a href="#回到選課表-1" class="headerlink" title="回到選課表"></a>回到選課表</h4><p><img src="https://hackmd.io/_uploads/H1g98jqs5.png"><br>主鍵是由「學號」與「課程代碼」組成：</p>
+<ul>
+<li>姓名、性別，相依於 「學號」</li>
+<li>課程名稱、學分數、必選修、老師編號、老師姓名，相依於「課程代碼」</li>
+</ul>
+<h5 id="存在「部分功能相依」，需要將部分功能相依欄位分割（2NF），以下為分割後結果"><a href="#存在「部分功能相依」，需要將部分功能相依欄位分割（2NF），以下為分割後結果" class="headerlink" title="存在「部分功能相依」，需要將部分功能相依欄位分割（2NF），以下為分割後結果"></a>存在「部分功能相依」，需要將部分功能相依欄位分割（2NF），以下為分割後結果</h5><p><img src="https://hackmd.io/_uploads/ryleplp9ic.png"></p>
+<h5 id="發現「重複的資料」，因為需符合1NF，所以將重複的資料去除"><a href="#發現「重複的資料」，因為需符合1NF，所以將重複的資料去除" class="headerlink" title="發現「重複的資料」，因為需符合1NF，所以將重複的資料去除"></a>發現「重複的資料」，因為需符合1NF，所以將重複的資料去除</h5><p><img src="https://hackmd.io/_uploads/ryCK9o9j9.png"><br>紅底的欄位為「主鍵」</p>
+<h3 id="第三正規化（3NF）"><a href="#第三正規化（3NF）" class="headerlink" title="第三正規化（3NF）"></a>第三正規化（3NF）</h3><h4 id="定義-3"><a href="#定義-3" class="headerlink" title="定義"></a>定義</h4><ol>
+<li>符合2NF。</li>
+<li>各欄位之間沒有存在「遞移相依」的關係，也就是與「主鍵」無關的相依性。</li>
+</ol>
+<h4 id="作法-2"><a href="#作法-2" class="headerlink" title="作法"></a>作法</h4><ol>
+<li>檢查是否存在「遞移相依」的欄位。</li>
+<li>將「遞移相依」的欄位分割出去，另外組成新的資料表。</li>
+</ol>
+<h4 id="將有遞移相依的欄位分割出去"><a href="#將有遞移相依的欄位分割出去" class="headerlink" title="將有遞移相依的欄位分割出去"></a>將有遞移相依的欄位分割出去</h4><ol>
+<li>檢查是否存在遞移相依（與主鍵無關的相依性）。<br><img src="https://hackmd.io/_uploads/Sy8aaj9j5.png"></li>
+</ol>
+<ul>
+<li>「老師編號」相依於「課程代碼」而且「老師姓名」相依於「老師編號」，所以「老師姓名」與「課程編號」（主鍵）為無關的相依。</li>
+<li>「老師姓名」與主鍵存在著「遞移相依」的關係。</li>
+</ul>
+<ol start="2">
+<li>分割欄位<br><img src="https://hackmd.io/_uploads/S1X3ao5sc.png"></li>
+</ol>
+<h3 id="正規化結果"><a href="#正規化結果" class="headerlink" title="正規化結果"></a>正規化結果</h3><p><img src="https://hackmd.io/_uploads/HypaX29oc.png"></p>
+<h3 id="Boyee-Codd正規化（BCNF）"><a href="#Boyee-Codd正規化（BCNF）" class="headerlink" title="Boyee-Codd正規化（BCNF）"></a>Boyee-Codd正規化（BCNF）</h3><p>視情況使用，實務上大多都只會做到3NF。</p>
+<h4 id="定義-4"><a href="#定義-4" class="headerlink" title="定義"></a>定義</h4><ul>
+<li>3NF的改良式(必須滿足3NF)。</li>
+<li>主鍵中的各欄位（單獨看）不可以相依於其他非主鍵的欄位。</li>
+</ul>
+<h4 id="作法-3"><a href="#作法-3" class="headerlink" title="作法"></a>作法</h4><ol>
+<li>確認由多個欄位組成的主鍵是否有其他欄位相依於主鍵中的每個欄位。</li>
+<li>如有獨立相依的情況，新增一個獨立的主鍵欄位。</li>
+</ol>
+<h4 id="確認資料表是否都有符合BCNF"><a href="#確認資料表是否都有符合BCNF" class="headerlink" title="確認資料表是否都有符合BCNF"></a>確認資料表是否都有符合BCNF</h4><ul>
+<li>學生資料表<ul>
+<li>3NF</li>
+<li>單一主鍵</li>
+<li>符合BCNF</li>
+</ul>
+</li>
+<li>課程資料表<ul>
+<li>3NF</li>
+<li>單一主鍵</li>
+<li>符合BCNF</li>
+</ul>
+</li>
+<li>老師資料表<ul>
+<li>3NF</li>
+<li>單一主鍵</li>
+<li>符合BCNF</li>
+</ul>
+</li>
+<li>成績資料表<ul>
+<li>3NF</li>
+<li>主鍵由兩個欄位組成，但：<ul>
+<li>成績相依於「學號」及「課程代碼」欄位</li>
+<li>成績未相依於「學號」（必須要有課程代碼才知道是哪堂課的分數）</li>
+<li>成績未相依於「課程代碼」（必須要有學號才知道是誰的分數）</li>
+</ul>
+</li>
+<li>符合BCNF</li>
+</ul>
+</li>
+</ul>
+<h2 id="Schema"><a href="#Schema" class="headerlink" title="Schema"></a>Schema</h2><p><img src="https://hackmd.io/_uploads/B1MFq65o9.png"></p>
+<h2 id="結論"><a href="#結論" class="headerlink" title="結論"></a>結論</h2><ul>
+<li>每個階段的正規化，都會產生一個要解決的問題<ul>
+<li>1NF:去除重複資料。</li>
+<li>2NF:去除部分功能相依。</li>
+<li>3NF:去除遞移相依。</li>
+<li>BCNF:去除因功能相依產生的異常。</li>
+</ul>
+</li>
+<li>實務上我們都會做到第三正規化（3NF）。</li>
+<li>設計不當的資料（未正規化），會導致異動操作可能會有問題。<ul>
+<li>新增異常</li>
+<li>刪除異常</li>
+<li>更新異常</li>
+</ul>
+</li>
+<li>適當的正規化，可以確保數據資料的一致性。</li>
+<li>當遇到資料處理速度上的困擾，或是因分割後造成的損失時，會將資料表「反正規化」。<ul>
+<li>商品的庫存</li>
+<li>剩餘點數</li>
+<li>…</li>
+</ul>
+</li>
+<li>在效能的考量之下的反正規化設計，需要小心控制「資料重複性的問題」及「更新的異常」。</li>
+</ul>
+<h2 id="參考資料"><a href="#參考資料" class="headerlink" title="參考資料"></a>參考資料</h2><ul>
+<li><a target="_blank" rel="noopener" href="http://cc.cust.edu.tw/~ccchen/doc/db_04.pdf">http://cc.cust.edu.tw/~ccchen/doc/db_04.pdf</a></li>
+<li><a target="_blank" rel="noopener" href="http://debussy.im.nuu.edu.tw/sjchen/Database/Final/Ch05.pdf">http://debussy.im.nuu.edu.tw/sjchen/Database/Final/Ch05.pdf</a></li>
+<li><a target="_blank" rel="noopener" href="https://ithelp.ithome.com.tw/articles/10223029">https://ithelp.ithome.com.tw/articles/10223029</a></li>
+</ul>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/SQL/" rel="tag"># SQL</a>
+              <a href="/tags/Normalization/" rel="tag"># Normalization</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/2022/06/17/C-%E5%AD%B8%E7%BF%92%E7%AD%86%E8%A8%98-%E7%89%A9%E4%BB%B6%E8%88%87%E9%A1%9E%E5%88%A5-5-%E6%8A%BD%E8%B1%A1%E5%92%8C%E5%AF%86%E5%B0%81%E9%A1%9E%E5%88%A5%E4%BB%A5%E5%8F%8A%E9%A1%9E%E5%88%A5%E6%88%90%E5%93%A1/" rel="prev" title="C#學習筆記-物件與類別(5)抽象和密封類別以及類別成員">
+                  <i class="fa fa-chevron-left"></i> C#學習筆記-物件與類別(5)抽象和密封類別以及類別成員
+                </a>
+            </div>
+            <div class="post-nav-item">
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+    
+  <div class="comments" id="disqus_thread">
+    <noscript>Please enable JavaScript to view the comments powered by Disqus.</noscript>
+  </div>
+  
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+
+<div class="copyright">
+  &copy; 
+  <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class="fa-solid fa-laptop-code"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Andy Huang</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/" rel="noopener" target="_blank">NexT.Gemini</a> 強力驅動
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous"></script>
+<script src="/js/comments.js"></script><script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/next-boot.js"></script>
+
+  
+
+
+
+
+
+  
+
+
+
+
+<script class="next-config" data-name="disqus" type="application/json">{"enable":true,"shortname":"andy-develop-note","count":true,"i18n":{"disqus":"disqus"}}</script>
+<script src="/js/third-party/comments/disqus.js"></script>
+
+</body>
+</html>
